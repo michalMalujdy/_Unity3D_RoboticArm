@@ -1,0 +1,32 @@
+Initialize engine version: 5.4.2f2 (b7e030c65c9b)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: AMD Radeon R9 200 / HD 7900 Series (ID=0x6798)
+    Vendor:   ATI
+    VRAM:     3053 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
+Loading C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
+Platform assembly: C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.077 seconds
+Platform assembly: C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\UnityProjects\Robotic Arm Project\RoboticArm_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 60Hz; virtual: 2970x1680 at -1050,-339
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 1.130510 ms
+Setting up 1 worker threads for Enlighten.
+  Thread -> id: 3518 -> priority: 1 
+OK!
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
