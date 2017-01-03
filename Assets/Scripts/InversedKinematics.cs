@@ -8,6 +8,12 @@ public class InversedKinematics : MonoBehaviour {
     public InputField yPositionInpuField;
     public InputField zPositionInpuField;
 
+    //Boundary of a working volume. Necessary for checking whether indicated point is inside the working volume
+    private float circleRadius;
+    private float margin = 0.001f;
+    private float zMin = 1.15f;
+    private float zMax = 2.75f;
+
     public Text IK_Text;
     public Transform Grabber;
 
@@ -15,6 +21,15 @@ public class InversedKinematics : MonoBehaviour {
     private float theta1;
     private float theta2;
     private float theta3;
+
+    //Position from input fields
+    float x;
+    float y;
+    float z;
+
+    public Transform cylinder1;
+    public Transform cylinder2;
+    public Transform cylinder3;
 
     //Turn off text timer
     bool isTimerOn = false;
@@ -46,15 +61,45 @@ public class InversedKinematics : MonoBehaviour {
             IK_Text.gameObject.SetActive(true);
             passedTime = 0.0f;
             isTimerOn = true;
-        }
 
-        CalculateIK();
-        Debug.Log("T1=" + RadiansToDegrees(theta1) + ", T2=" + RadiansToDegrees(theta2));
+            theta1 = 0.0f;
+            theta2 = 0.0f;
+        }
+        else
+        {
+            CalculateIK();
+            SetJointsRotations();
+            Debug.Log("T1=" + RadiansToDegrees(theta1) + ", T2=" + RadiansToDegrees(theta2));
+        }       
     }
 
     bool CheckIfPointInWorkingVolume()
     {
-        return true;
+        bool xResult = float.TryParse(xPositionInpuField.text, out x);
+        bool yResult = float.TryParse(yPositionInpuField.text, out y);
+        bool zResult = float.TryParse(zPositionInpuField.text, out z);
+
+        if(!(xResult && yResult && zResult))
+        {
+            return false;
+        }
+
+        x = Mathf.Floor(x * 10000.0f) / 10000.0f;
+        y = Mathf.Floor(y * 10000.0f) / 10000.0f;
+
+        circleRadius = Mathf.Sqrt(Mathf.Pow(x, 2.0f) + Mathf.Pow(y, 2.0f));
+
+        float leftSideCircleEquation = Mathf.Pow(x, 2.0f) + Mathf.Pow(y, 2.0f);
+        float rightSideCircleEquation = Mathf.Pow(circleRadius, 2.0f);
+
+        if (leftSideCircleEquation >= rightSideCircleEquation - margin && leftSideCircleEquation <= rightSideCircleEquation + margin)
+        {
+            if (z >= zMin && z <= zMax)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     void CalculateIK()
@@ -67,9 +112,13 @@ public class InversedKinematics : MonoBehaviour {
         float pz;
 
         //Reading desired position of the Grabber from input fields in menu
-        px = Grabber.position.x;
-        py = Grabber.position.y;
-        pz = Grabber.position.z;
+        px = x;
+        py = y;
+        pz = z;
+
+        Debug.Log("x=" + Grabber.position.x);
+        Debug.Log("y=" + Grabber.position.y);
+        Debug.Log("z=" + Grabber.position.z);
 
         float l1 = 1.95f;
         float l2 = 1.65f;
@@ -80,13 +129,25 @@ public class InversedKinematics : MonoBehaviour {
 
         //Calculating theta2
         float sinTheta2 = Mathf.Sqrt(Mathf.Pow(r,2.0f) - Mathf.Pow(l2 + l4, 2.0f)) / l3;
+
+        
+
         theta2 = Mathf.Atan2(sinTheta2, Mathf.Sqrt(1 - Mathf.Pow(sinTheta2, 2.0f)));
+
+        theta2 *= Mathf.Sign(sinTheta2);
+
         //theta2 = Mathf.Asin(sinTheta2);
 
         //Calculating theta1
         float beta = Mathf.Atan2(py, px);
         float alpha = Mathf.Atan2(l3 * sinTheta2, r);
         theta1 = beta - alpha;
+    }
+
+    void SetJointsRotations()
+    {
+        cylinder1.localEulerAngles = new Vector3(0.0f, RadiansToDegrees(theta1), 0.0f);
+        cylinder2.localEulerAngles = new Vector3(0.0f, RadiansToDegrees(theta2), 0.0f);
     }
 
     float RadiansToDegrees(float angle)
