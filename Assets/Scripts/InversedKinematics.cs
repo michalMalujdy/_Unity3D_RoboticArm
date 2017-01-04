@@ -27,6 +27,9 @@ public class InversedKinematics : MonoBehaviour {
     float y;
     float z;
 
+    //Real grabber position for tests
+    Vector3 grabberPosition;
+
     public Transform cylinder1;
     public Transform cylinder2;
     public Transform cylinder3;
@@ -35,6 +38,7 @@ public class InversedKinematics : MonoBehaviour {
     bool isTimerOn = false;
     float duration = 3.0f;
     float passedTime = 0.0f;
+    
 
     // Use this for initialization
     void Start () {
@@ -67,8 +71,15 @@ public class InversedKinematics : MonoBehaviour {
         }
         else
         {
+            //Debug.ClearDeveloperConsole();
+            grabberPosition = Grabber.position;
+            Debug.Log("Grabber position before IK:" + grabberPosition);
+
             CalculateIK();
             SetJointsRotations();
+
+            grabberPosition = Grabber.position;
+            Debug.Log("Grabber position after IK:" + grabberPosition);
             Debug.Log("T1=" + RadiansToDegrees(theta1) + ", T2=" + RadiansToDegrees(theta2));
         }       
     }
@@ -116,10 +127,6 @@ public class InversedKinematics : MonoBehaviour {
         py = y;
         pz = z;
 
-        Debug.Log("x=" + Grabber.position.x);
-        Debug.Log("y=" + Grabber.position.y);
-        Debug.Log("z=" + Grabber.position.z);
-
         float l1 = 1.95f;
         float l2 = 1.65f;
         float l3 = 0.8f;
@@ -127,16 +134,20 @@ public class InversedKinematics : MonoBehaviour {
 
         r = Mathf.Sqrt(Mathf.Pow(px, 2.0f) + Mathf.Pow(py, 2.0f));
 
-        //Calculating theta2
-        float sinTheta2 = Mathf.Sqrt(Mathf.Pow(r,2.0f) - Mathf.Pow(l2 + l4, 2.0f)) / l3;
+        //Start calculations of theta2
+        float sinTheta2;
+        float temp = Mathf.Pow(r, 2.0f) - Mathf.Pow(l2 + l4, 2.0f);
 
-        
+        if (temp > 0) sinTheta2 = Mathf.Sqrt(temp) / l3;
+        else sinTheta2 = 0.0f;
 
-        theta2 = Mathf.Atan2(sinTheta2, Mathf.Sqrt(1 - Mathf.Pow(sinTheta2, 2.0f)));
+        //sign of a sinTheta2. Because sinus is positive only in I and II quarter there is a need to check in which quarter the grabber is desired to be. It is multiplied by square root of 1-(sinTheta2)^2 calculating theta2.
+        int sign;
 
-        theta2 *= Mathf.Sign(sinTheta2);
+        if (pz < l1) sign = -1;
+        else sign = 1;
 
-        //theta2 = Mathf.Asin(sinTheta2);
+        theta2 = Mathf.Atan2(sinTheta2, sign * Mathf.Sqrt(1 - Mathf.Pow(sinTheta2, 2.0f)));
 
         //Calculating theta1
         float beta = Mathf.Atan2(py, px);
@@ -153,5 +164,10 @@ public class InversedKinematics : MonoBehaviour {
     float RadiansToDegrees(float angle)
     {
         return angle * 180.0f / Mathf.PI;
+    }
+
+    void CreateAnimation()
+    {
+        
     }
 }
