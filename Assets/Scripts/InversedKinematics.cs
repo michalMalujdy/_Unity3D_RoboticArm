@@ -4,13 +4,20 @@ using UnityEngine.UI;
 
 public class InversedKinematics : MonoBehaviour {
 
+    //Measurements of the robot
+    float l1 = 1.95f;
+    float l2 = 1.65f;
+    float l3 = 0.8f;
+    float l4 = 0.95f + 0.348f;
+    float l3s2;
+
     public InputField xPositionInpuField;
     public InputField yPositionInpuField;
     public InputField zPositionInpuField;
 
     //Boundary of a working volume. Necessary for checking whether indicated point is inside the working volume
     private float circleRadius;
-    private float margin = 0.001f;
+    private float margin = 0.012f;
     private float zMin = 1.15f;
     private float zMax = 2.75f;
 
@@ -71,7 +78,6 @@ public class InversedKinematics : MonoBehaviour {
         }
         else
         {
-            //Debug.ClearDeveloperConsole();
             grabberPosition = Grabber.position;
             Debug.Log("Grabber position before IK:" + grabberPosition);
 
@@ -95,13 +101,14 @@ public class InversedKinematics : MonoBehaviour {
             return false;
         }
 
-        x = Mathf.Floor(x * 10000.0f) / 10000.0f;
-        y = Mathf.Floor(y * 10000.0f) / 10000.0f;
+        //x = Mathf.Floor(x * 10000.0f) / 10000.0f;
+        //y = Mathf.Floor(y * 10000.0f) / 10000.0f;
 
-        circleRadius = Mathf.Sqrt(Mathf.Pow(x, 2.0f) + Mathf.Pow(y, 2.0f));
+        circleRadius = l2 + l4;
 
-        float leftSideCircleEquation = Mathf.Pow(x, 2.0f) + Mathf.Pow(y, 2.0f);
-        float rightSideCircleEquation = Mathf.Pow(circleRadius, 2.0f);
+        float leftSideCircleEquation = Mathf.Sqrt(Mathf.Pow(x, 2.0f) + Mathf.Pow(y, 2.0f) - Mathf.Pow(l3 * CalculateSinTheta2(x, y), 2.0f));
+        float rightSideCircleEquation = circleRadius;
+
 
         if (leftSideCircleEquation >= rightSideCircleEquation - margin && leftSideCircleEquation <= rightSideCircleEquation + margin)
         {
@@ -127,19 +134,10 @@ public class InversedKinematics : MonoBehaviour {
         py = y;
         pz = z;
 
-        float l1 = 1.95f;
-        float l2 = 1.65f;
-        float l3 = 0.8f;
-        float l4 = 0.95f + 0.348f;
-
         r = Mathf.Sqrt(Mathf.Pow(px, 2.0f) + Mathf.Pow(py, 2.0f));
 
         //Start calculations of theta2
-        float sinTheta2;
-        float temp = Mathf.Pow(r, 2.0f) - Mathf.Pow(l2 + l4, 2.0f);
-
-        if (temp > 0) sinTheta2 = Mathf.Sqrt(temp) / l3;
-        else sinTheta2 = 0.0f;
+        float sinTheta2 = CalculateSinTheta2(px, py);  
 
         //sign of a sinTheta2. Because sinus is positive only in I and II quarter there is a need to check in which quarter the grabber is desired to be. It is multiplied by square root of 1-(sinTheta2)^2 calculating theta2.
         int sign;
@@ -169,5 +167,22 @@ public class InversedKinematics : MonoBehaviour {
     void CreateAnimation()
     {
         
+    }
+
+    float CalculateSinTheta2(float px, float py)
+    {
+        float sinTheta2 = 0.0f;
+
+        float r = Mathf.Sqrt(Mathf.Pow(px, 2.0f) + Mathf.Pow(py, 2.0f));
+
+        float temp = Mathf.Pow(r, 2.0f) - Mathf.Pow(l2 + l4, 2.0f);
+
+        if (temp > 0 && temp < 1) sinTheta2 = Mathf.Sqrt(temp) / l3;
+
+        if (temp < 0.0f || sinTheta2 < 0.0f) sinTheta2 = 0.0f;
+
+        if (temp > 1.0f || sinTheta2 > 1.0f) sinTheta2 = 1.0f;
+
+        return sinTheta2;
     }
 }
